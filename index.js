@@ -69,28 +69,22 @@ client.connect(err => {
 
         const filePath = `${__dirname}/ReviewProvider/${file.name}`
 
-        file.mv(filePath, err => {
-            if (err) {
-                console.log(err)
-                return res.status(500).send({ message: "Sorry unable to upload image" })
-            }
 
-            const newImg = fs.readFileSync(filePath)
-            const encImg = newImg.toString('base64')
+        const newImg = req.files.file.data
+        const encImg = newImg.toString('base64')
 
 
-            const image = {
-                contentType: req.files.file.mimetype,
-                size: req.files.file.size,
-                img: Buffer(encImg, 'base64')
-            }
+        const image = {
+            contentType: req.files.file.mimetype,
+            size: req.files.file.size,
+            img: Buffer.from(encImg, 'base64')
+        }
 
-            reviewCollection.insertOne({ name, email, message, img: image })
-                .then(result => {
-                    res.status(500).send({ file: file.name })
-                })
+        reviewCollection.insertOne({ name, email, message, img: image })
+            .then(result => {
+                res.status(500).send({ file: file.name })
+            })
 
-        })
     })
 
 
